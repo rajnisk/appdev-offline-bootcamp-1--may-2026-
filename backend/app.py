@@ -1,98 +1,43 @@
-from flask import Flask, request
-from flask_restful import Resource, Api
-from flask_sqlalchemy import SQLAlchemy
+import os
 
-app = Flask(__name__)
-api = Api(app)
+from dotenv import load_dotenv
+from flask import Flask
+from flask_cors import CORS
+from flask_restful import Api
+from werkzeug.security import generate_password_hash
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///mad2.db"
-db = SQLAlchemy(app)
+load_dotenv()
 
-
-# Models
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False, unique=True)
-    password = db.Column(db.String(100), nullable=False)
-    role = db.Column(db.String(50), default='employee')
-
-    def to_json(self):
-        return{
-            'full_name':self.full_name,
-            'email': self.email,
-            'role': self.role
-        }
+from controllers import register_api
+from extensions import db
+from models import User
 
 
-with app.app_context():
-    db.create_all()
+
+def create_app():
+    app = Flask(__name__)
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+        "DATABASE_URL", "sqlite:///app.db"
+    )
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 
-class UserRes(Resource):
-    def get(self):
-        employee = User.query.filter_by(role='employee').all()
-        print(employee)
-        return {
-            'name':employee[0].full_name
-        }
-    def put(self):
-        data = request.get_json() or {}
-        user_id = data.get('user_id')
-        full_name = data.get('full_name')
 
-        user = User.query.get(user_id)
-        user.full_name = full_name
-
-        db.session.commit()
-        return {'msg': f'user name updated to {full_name}!'}
-    def delete(self):
-        data = request.get_json()
-        user_id = data.get('user_id')
-
-        user = User.query.get(user_id)
-        db.session.delete(user)
-        db.session.commit()
+    db.init_app(app)
 
 
-class UserResource(Resource):
-    def get(self):
-        users = User.query.all()
-        data = []
-        for user in users:
-            data.append(user.to_json())
-        return {'msg':data}
-    
-
-    def post(self):
-        print('inside post')
-        data = request.get_json() or {}
-        print(data)
-        full_name = data['full_name']
-        email = data['email']
-        password = data['password']
-
-        user = User(full_name=full_name, email=email, password=password)
-        db.session.add(user)
-        db.session.commit()
-
-        print(full_name, email, password)
-        return {"msg":"--"}
+    api = Api(app)
+    register_api(api)
 
 
-class HelloWorld(Resource):
-    def get(self):
-        return {'hello': 'world'}
-    
-    def post(self):
-        data = request.get_json() or {}
-        print(data)
-        return {'data': 'from post method'}
-    
+    with app.app_context():
+        db.create_all()
 
-api.add_resource(HelloWorld, '/')
-api.add_resource(UserResource, '/user')
-api.add_resource(UserRes, '/usr')
 
-if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+    return app
+
+
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(debug=True, host="127.0.0.1", port=int(os.getenv("PORT", "5000")))
