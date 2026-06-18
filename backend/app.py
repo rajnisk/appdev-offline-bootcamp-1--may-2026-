@@ -9,8 +9,17 @@ from werkzeug.security import generate_password_hash
 load_dotenv()
 
 from controllers import register_api
-from extensions import db
+from extensions import db, jwt
 from models import User
+
+def ensure_admin():
+
+    admin = User.query.filter_by(role='admin').first()
+    if not admin:
+        admin = User(full_name="admin", role="admin", password="admin", email="admin@mail.com")
+        db.session.add(admin)
+        db.session.commit()
+
 
 def create_app():
     app = Flask(__name__)
@@ -19,10 +28,12 @@ def create_app():
     )
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+    app.config["JWT_SECRET_KEY"] = "not-super-secret"  
 
+    CORS(app)
 
     db.init_app(app)
-
+    jwt.init_app(app)
 
     api = Api(app)
     register_api(api)
@@ -30,6 +41,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        ensure_admin()
     return app
 
 
