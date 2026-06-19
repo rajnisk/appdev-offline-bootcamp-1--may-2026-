@@ -14,3 +14,23 @@ class User(db.Model):
             'email': self.email,
             'role': self.role
         }
+
+class Task(db.Model):
+    id =db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.String(250))
+    assigned_date = db.Column(db.DateTime, nullable=True)
+    due_date = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(50), default='pending')
+
+    assigned_to = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    
+    def to_json(self):
+        return{
+            'title': self.title,
+            'description': self.description,
+            'assigned_date': self.assigned_date,
+            'due_date': self.due_date,
+            'status': self.status,
+            'assigned_to': self.assigned_to
+        }

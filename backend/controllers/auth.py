@@ -14,7 +14,7 @@ class Register(Resource):
             return {'msg': 'full name is required'}
 
         user = User.query.filter_by(email=email).first()
-        print(user.full_name)
+
         if user:
             return {'msg': 'email already registered'}, 400
 
