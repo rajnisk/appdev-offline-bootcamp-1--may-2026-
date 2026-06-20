@@ -27,10 +27,11 @@ class Task(db.Model):
     
     def to_json(self):
         return{
+            'id': self.id,
             'title': self.title,
             'description': self.description,
-            'assigned_date': self.assigned_date,
-            'due_date': self.due_date,
+            'assigned_date': self.assigned_date.isoformat() if self.assigned_date else None,
+            'due_date': self.due_date.isoformat() if self.due_date else None,
             'status': self.status,
             'assigned_to': self.assigned_to
         }
