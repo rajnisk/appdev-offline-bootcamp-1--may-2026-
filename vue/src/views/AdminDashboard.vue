@@ -145,30 +145,3 @@ export default {
 }
 
 </script>
-
-<style scoped>
-.admin-dashboard {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #f9fafb;
-}
-
-.dashboard-content {
-    flex: 1;
-    padding: 24px;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 420px;
-}
-
-input,
-select,
-button {
-    padding: 10px 12px;
-}
-</style>

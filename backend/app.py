@@ -15,7 +15,8 @@ from models import User
 def ensure_admin():
     admin = User.query.filter_by(role='admin').first()
     if not admin:
-        admin = User(full_name="admin", role="admin", password="admin", email="admin@mail.com")
+        password = generate_password_hash('admin')
+        admin = User(full_name="admin", role="admin", password=password, email="admin@mail.com")
         db.session.add(admin)
         db.session.commit()
 
@@ -39,7 +40,7 @@ def create_app():
 
 
     with app.app_context():
-        # db.drop_all()
+        db.drop_all()
         db.create_all()
         ensure_admin()
     return app

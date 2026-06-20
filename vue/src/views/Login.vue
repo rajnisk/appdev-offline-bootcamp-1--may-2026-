@@ -30,6 +30,12 @@ export default {
             alert(response.data.msg)
             this.access_token = response.data.access_token
             localStorage.setItem('access_token', this.access_token)
+            if(response.data.role === 'admin'){
+                this.$router.push('/admin')
+            }
+            //  else {
+            //     this.$router.push('/user')
+            // }
         }
 
     }
