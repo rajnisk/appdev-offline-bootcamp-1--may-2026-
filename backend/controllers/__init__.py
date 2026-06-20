@@ -1,4 +1,4 @@
-from controllers.example import HelloWorld
+from controllers.example import HelloWorld, CacheDemo, DeleteCache, SendEmail
 from controllers.auth import Login, Register
 from controllers.tasks import TaskResouce, UserResource
 
@@ -8,3 +8,6 @@ def register_api(api):
     api.add_resource(Login, '/login')
     api.add_resource(TaskResouce, '/task', '/task/<int:task_id>')
     api.add_resource(UserResource, '/users')
+    api.add_resource(CacheDemo, '/cache')
+    api.add_resource(DeleteCache, '/delete-cache')
+    api.add_resource(SendEmail, '/send-email')
